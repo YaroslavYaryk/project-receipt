@@ -1,0 +1,106 @@
+{% extends '../base/base.html' %}
+{% load static %}
+
+
+{% block link %}
+    <link rel="stylesheet" href="{% static 'css/base/home.css' %}">
+{% endblock link %}
+
+{% block section %}
+
+   <div class="container mt-3">
+    <div class="block-header">
+        <div class="header-inner" style="display: flex; justify-content:space-between;">
+            <div class="spanner"></div>
+            <div class="block-add-new-receipt">
+                <a class="btn btn-success" href="{% url 'create_receipt' %}">Create receipt</a>
+            </div>
+        </div>
+    </div>
+    <div class="block_list mt-4">
+        {% for receipt in my_receipts %}
+            <div class="card mb-12" >
+                <div class="row g-0">
+                <div class="col-md-4 image-container" >
+                    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in receipt.photos.all %}
+                                <div class="carousel-item active">
+                                <img src="{{image.photo.url}}" class="d-block  image-carusel-item w-50" style="max-height:400px"   alt="...">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                          <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                          <span class="visually-hidden">Next</span>
+                        </button>
+                      </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                    <h4 class="card-title mb-3">Project Name</h4>
+                    <div class="block mb-3" style="font-size: 18px;">
+                        <label for="">Date: </label>
+                        {{receipt.date}}
+                    </div>
+                    <div class="block mb-3" style="font-size: 18px;">
+                        <label for="">Category: </label>
+                        {{receipt.category.name}}
+                    </div>
+                    <div class="block mb-4" style="font-size: 18px;">
+                        <label for="">Price: </label>
+                        {{receipt.price}} <span style="font-size: 15px;">NOK</span>
+                    </div>
+                    <p class="card-text"><small class="text-muted">{{receipt.comment}}</small></p>
+                    </div>
+                    <div class="bottom-block" style="display: flex; justify-content:space-between; width:99%; margin-bottom:10px">
+                        <div class="a"></div>
+                        <div class="block" style="display: flex; justify-content:space-around; gap:10px">
+                            <a class="btn btn-danger" href="">Delete</a>
+                                
+                                <a class="btn btn-info" href="">Edit</a>
+                            <a class="btn btn-secondary" href="">Read more</a>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+   </div>
+
+{% endblock section %}
+
+{% block javascript %}
+
+   <script type="text/javascript">
+
+    var imageContainer = document.querySelector(".image-container")
+   var photos = document.querySelectorAll(".image-carusel-item")
+   var max_height = 400
+   photos.forEach((elem) =>{
+    elem.style.maxHeight = "290px"
+       if(elem.offsetWidth > imageContainer.offsetWidth){
+        console.log("here1")
+        elem.style.width = imageContainer.offsetWidth 
+        elem.style.height = elem.offsetHeight * (imageContainer.offsetWidth / elem.offsetWidth)+ "px"
+    
+    }else if (elem.offsetHeight > max_height){
+        console.log("here2")
+
+        elem.width = elem.offsetWidth * (max_height / elem.offsetHeight) 
+    }
+    console.log(imageContainer.offsetWidth, elem.width)
+    elem.style.marginLeft = (imageContainer.offsetWidth - elem.width) / 2 + "px"
+   })
+
+
+   </script>
+
+{% endblock javascript %}
+
+<a href="{% url 'send' %}">SEND</a>

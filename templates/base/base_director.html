@@ -1,0 +1,40 @@
+{% extends './base.html' %}
+{% load static %}
+{% block link %}
+    <link rel="stylesheet" href="{% static 'css/worker/home.css' %}">
+{% endblock link %}
+{% block header_block %}
+    <li class="sub-menu-parent" tab-index="0">
+        <a class="title_link" href="#">Rooms</a>
+        <ul class="sub-menu">
+            <li>
+                <a class="title_link" href="{% url 'room_list' %}">Rooms</a>
+            </li>
+            <li>
+                <a class="title_link" href="{% url 'create_room' %}">Create room</a>
+            </li>
+        </ul>
+    </li>
+    <li class="sub-menu-parent" tab-index="0">
+        <a class="title_link" href="#">Work</a>
+        <ul class="sub-menu">
+            <li>
+                <a class="title_link" href="{% url 'create_shift' %}">Create shift</a>
+            </li>
+            <li>
+                <a class="title_link" href="{% url 'get_workers_shifts_work_list' -1 %}">Shifts</a>
+            </li>
+        </ul>
+    </li>
+    <li class="sub-menu-parent" tab-index="0">
+        <a class="title_link" href="#">Workers</a>
+        <ul class="sub-menu">
+            <li>
+                <a class="title_link" href="{% url 'get_all_workers' %}">Workers</a>
+            </li>
+            <li>
+                <a class="title_link" href="{% url 'get_workers_free_dates' %}">Free dates</a>
+            </li>
+        </ul>
+    </li>
+{% endblock header_block %}

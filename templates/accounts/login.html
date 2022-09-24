@@ -1,0 +1,96 @@
+{% extends './auth_base.html' %}
+{% load static %}
+{% block link %}
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap"
+          rel="stylesheet">
+    <link rel="icon" href="{% static "images/login.png" %}">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock link %}
+{% block section %}
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center"></div>
+            <div class="row justify-content-center">
+                <div class="col-md-12 col-lg-10">
+                    <div class="wrap d-md-flex">
+                        <div class="img"
+                             style="background-image: url({% static 'images/restaurant.jpg' %});"></div>
+                        <div class="login-wrap p-4 p-md-5">
+                            <div class="d-flex">
+                                <div class="w-100">
+                                    <h3 class="mb-4">Sign In</h3>
+                                </div>
+                                <div class="w-100">
+                                    <p class="social-media d-flex justify-content-end">
+                                        <a href="#"
+                                           class="social-icon d-flex align-items-center justify-content-center"><span class="fa fa-facebook"></span></a>
+                                        <a href="#"
+                                           class="social-icon d-flex align-items-center justify-content-center"><span class="fa fa-twitter"></span></a>
+                                    </p>
+                                </div>
+                            </div>
+                            {% if messages %}
+                                <div class="messages">
+                                    {% for message in messages %}
+                                        {% if message.tags == 'error' %}
+                                            <div class="alert alert-danger" role="alert">{{ message }}</div>
+                                        {% elif message.tags == 'critical' %}
+                                            <div class="alert alert-primary" role="alert">{{ message }}</div>
+                                        {% else %}
+                                            <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {% if form.errors %}
+                                    {% for field in form %}
+                                        {% for error in field.errors %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endfor %}
+                                    {% endfor %}
+                                    {% for error in form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endfor %}
+                                {% endif %}
+                            {% endif %}
+                            <form method="POST" class="signin-form">
+{% csrf_token %}
+                                <div class="form-group mb-3">
+                                    <label class="label" for="name">Email</label>
+{{ form.username }}
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="label" for="password">Password</label>
+{{ form.password }}
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit"
+                                            class="form-control btn btn-primary rounded submit px-3">Sign In</button>
+                                </div>
+                                <div class="form-group d-md-flex">
+                                    <div class="w-50 text-left">
+                                        <label class="checkbox-wrap checkbox-primary mb-0">
+                                            Remember Me
+                                            <input type="checkbox" checked>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    <div class="w-50 text-md-right">
+                                        <a href="{% url 'reset_password' %}">Forgot Password</a>
+                                    </div>
+                                </div>
+                            </form>
+                            <p class="text-center">
+                                 Don't have an account?
+                                <a href="{% url 'register' %}">Sign Up</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+{% endblock section %}
