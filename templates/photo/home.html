@@ -42,7 +42,7 @@
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
-                    <h4 class="card-title mb-3">Project Name</h4>
+                    <h4 class="card-title mb-3">{{receipt.project.name}}</h4>
                     <div class="block mb-3" style="font-size: 18px;">
                         <label for="">Date: </label>
                         {{receipt.date}}
@@ -62,7 +62,7 @@
                         <div class="block" style="display: flex; justify-content:space-around; gap:10px">
                             <a class="btn btn-danger" href="">Delete</a>
                                 
-                                <a class="btn btn-info" href="">Edit</a>
+                                <a class="btn btn-info" href="{% url 'edit_receipt' receipt.id %}">Edit</a>
                             <a class="btn btn-secondary" href="">Read more</a>
                         </div>
                     </div>

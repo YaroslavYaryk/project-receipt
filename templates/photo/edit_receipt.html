@@ -1,0 +1,176 @@
+{% extends '../base/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load project_tags %}
+
+{% block link %}
+    <link rel="stylesheet" href="{% static 'css/base/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/falcon/flatpickr.min.css' %}">
+{% endblock link %}
+
+{% block section %}
+
+<section class="ftco-section mt-5" >
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10">
+                <div class="wrap d-md-flex"   style="background: #fff; border-radius:20px">
+                    {% comment %} <div class="img"
+  style="background-image: url({% static 'images/restaurant.jpg' %});"></div> {% endcomment %}
+                    <div class="login-wrap p-4 p-md-5" style=" width:100%">
+                        <div class="d-flex">
+                            <div class="w-100">
+                                <h3 class="mb-4">Edit Receipt</h3>
+                            </div>
+                        </div>
+                        {% if form.errors %}
+                            {% for field in form %}
+                                {% for error in field.errors %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endfor %}
+                        {% endif %}
+    <form class="signin-form" method="POST" enctype="multipart/form-data">
+        <div class="">{% csrf_token %}</div>
+        <div class="form-row" style="">
+            <div class="form-group col-md-12 mb-2">
+                <label style="margin-bottom: 0px;" class="label" for="password">Category</label>
+                <select name="categories" id=""  class="form-control category-input">
+                    {% for elem in categories %}
+                        {% if elem|index:0 == receipt.category.name %}
+                            <option selected value="{{elem|index:0}}">{{elem|index:1}}</option>
+                        {% else %}
+                            <option value="{{elem|index:0}}">{{elem|index:1}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <div class="form-error">{{ form.category.errors }}</div>
+            </div>
+            <div class="form-group col-md-12 mb-2">
+                <input placeholder="Other category" type="text" class="form-control other-category" style="display: none;" name="category-input">
+            </div>
+
+            <div class="form-group col-md-12 mb-2">
+                <label style="margin-bottom: 0px;" class="label" for="password">Project</label>
+                <select name="projects" id=""  class="form-control project-input">
+                    {% for elem in projects %}
+                            {% if elem|index:0 == receipt.project.name %}
+                                <option selected value="{{elem|index:0}}">{{elem|index:1}}</option>
+                            {% else %}
+                                <option value="{{elem|index:0}}">{{elem|index:1}}</option>
+                            {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-md-12 mb-2">
+                <input placeholder="Other project" type="text" class="form-control other-project" style="display: none;" name="project-input">
+            </div>
+
+            <div class="form-row " style="display: flex; justify-content:space-between">
+                <div class="form-group col-md-6 mb-2">
+                    <label style="margin-bottom: 5px;" class="label" for="password">Image from camera</label>
+                    <div class=""><input type="file" style=" padding:5px" class="form-control" capture="user" accept="image/*" id="imageFile"  name="photos"></div>
+                    <div class="form-error">{{ form.date.errors }}</div>
+                </div>
+                <div class="form-group col-md-6  mb-2">
+                    <div class="block" style="display: flex; justify-content:space-between">
+                        <label style="margin-bottom: 5px;" class="label" for="password">Image from photos</label>
+                        {% if receipt.photos.all|length == 1 %}
+                            <p>{{receipt.photos.all|length}} photo is uploaded </p>
+                        
+                        {% else %}
+                            <p>{{receipt.photos.all|length}} photos are uploaded</p>
+
+                        {% endif %}
+                    </div>
+                    <div class=""><input type="file" style=" padding:5px" class="form-control" accept="image/*" multiple  name="photos"></div>
+                    <div class="form-error">{{ form.price.errors }}</div>
+                </div>
+            </div>
+            <div class="form-row " style="display: flex; justify-content:space-between">
+                <div class="form-group col-md-6 mb-2">
+                    <label style="margin-bottom: 0px;" class="label" for="password">Date</label>
+                    <div class="">{{ form.date|add_class:"form-control datetimepicker" }}</div>
+                    <div class="form-error">{{ form.date.errors }}</div>
+                </div>
+                <div class="form-group col-md-6 mb-2">
+                    <label style="margin-bottom: 0px;" class="label" for="password">Price</label>
+                    <div class="">{{ form.price|add_class:"form-control " }}</div>
+                    <div class="form-error">{{ form.price.errors }}</div>
+                </div>
+            </div>
+            <div class="form-group col-md-12 mb-2">
+                <label style="margin-bottom: 0px;" class="label" for="password">Company</label>
+                <div class="">{{ form.company|add_class:"form-control" }}</div>
+                <div class="form-error">{{ form.company.errors }}</div>
+            </div>
+            <div class="form-group col-md-12 mb-2">
+                <label style="margin-bottom: 0px;" class="label" for="password">Business</label>
+                <div class="">{{ form.business|add_class:"form-control" }}</div>
+                <div class="form-error">{{ form.business.errors }}</div>
+            </div><div class="form-group col-md-12 mb-2">
+                <label style="margin-bottom: 0px;" class="label" for="password">Persons</label>
+                <div class="">{{ form.persons|add_class:"form-control" }}</div>
+                <div class="form-error">{{ form.persons.errors }}</div>
+            </div>
+            <div class="form-group col-md-12 mb-3">
+                <label style="margin-bottom: 0px;" class="label" for="password">Description</label>
+                <div class="">{{ form.description|add_class:"form-control " }}</div>
+                <div class="form-error">{{ form.description.errors }}</div>
+            </div>
+            <div class="form-group col-md-12 mb-3">
+                <label style="margin-bottom: 0px;" class="label" for="password">Comment</label>
+                <div class="">{{ form.comment|add_class:"form-control " }}</div>
+                <div class="form-error">{{ form.comment.errors }}</div>
+            </div>
+        </div>
+        
+
+        
+        <div class="form-group">
+            <button type="submit"
+                    class="form-control btn rounded submit px-3 button_create" style="background: #898AA6; color:#EAF6F6; font-size: 20px;">Save</button>
+        </div>
+    </form>
+
+    
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+{% endblock section %}
+
+{% block javascript %}
+
+<script type="text/javascript">
+
+    
+
+    var category_input = document.querySelector(".category-input")
+    category_input.onchange = (e) =>{
+        other_category = document.querySelector(".other-category")
+        if (e.target.value == "other"){
+            other_category.style.display = "block"
+        }else{
+            other_category.style.display = "none"
+
+        }
+    }
+
+    var proiject_input = document.querySelector(".project-input")
+    proiject_input.onchange = (e) =>{
+        other_project = document.querySelector(".other-project")
+        if (e.target.value == "other"){
+            other_project.style.display = "block"
+        }else{
+            other_project.style.display = "none"
+
+        }
+    }
+
+   </script>
+   <script src="{% static 'js/flatpickr.js' %}"></script>
+
+{% endblock javascript %}

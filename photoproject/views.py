@@ -97,3 +97,38 @@ def get_projects_list(request):
     context = {"projects": users_projects}
 
     return render(request, "photo/projects.html", context)
+
+
+@login_required(login_url="login")
+def edit_receipt(request, receipt_id):
+
+    # categories with aditional "other" value
+    receipt = handle_receipt.get_receipt_by_user(receipt_id)
+    special_categories = handle_receipt.get_category_aditional_queryser()
+    special_projects = handle_receipt.get_projects_aditional_queryset(request.user)
+    if request.method == "POST":
+        form = ReceiptForm(request.POST, instance=receipt)
+
+        if form.is_valid():
+            receipt = form.save(commit=False)
+            handle_receipt.save_category(receipt, request.POST)
+            handle_receipt.save_project(receipt, request.POST)
+
+            handle_receipt.save_edit_images(receipt, request.FILES)
+            # print(form.cleaned_data, form.is_valid(), request.POST, request.FILES)
+            receipt.save()
+            return redirect("home")
+
+        else:
+            messages.error(request, form.errors)
+
+    form = ReceiptForm(instance=receipt)
+
+    context = {
+        "form": form,
+        "categories": special_categories,
+        "projects": special_projects,
+        "receipt": receipt,
+    }
+
+    return render(request, "photo/edit_receipt.html", context)

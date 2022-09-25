@@ -25,14 +25,15 @@ def get_project_by_name(name):
 
 
 def handle_create_category(name):
-    return Category.objects.create(name=name, slug=slugify(name))
+    return Category.objects.get_or_create(name=name, slug=slugify(name))[0]
 
 
 def handle_create_project(name, user):
-    return Project.objects.create(name=name, user=user)
+    return Project.objects.get_or_create(name=name, user=user)[0]
 
 
 def save_category(receipt, data):
+    print(data.get("categories"))
     if get_category_by_name(data.get("categories")):
         category = get_category_by_name(data.get("categories"))
 
@@ -62,6 +63,20 @@ def save_images(receipt, files):
     receipt.save()
 
 
+def delete_receipt_photos(receipt):
+    for image in receipt.photos.all():
+        image.delete()
+
+
+def save_edit_images(receipt, files):
+    if files.get("photos"):
+        delete_receipt_photos(receipt)
+        for image in files.getlist("photos"):
+            receipt.photos.add(Photo.objects.create(photo=image))
+
+    receipt.save()
+
+
 def get_receipts_by_user(user):
     return Receipt.objects.filter(user=user)
 
@@ -76,3 +91,7 @@ def get_projects_aditional_queryset(user):
         + [(el.name, el.name) for el in Project.objects.filter(user=user)]
         + [("other", "other")]
     )
+
+
+def get_receipt_by_user(receipt_id):
+    return Receipt.objects.get(pk=receipt_id)
