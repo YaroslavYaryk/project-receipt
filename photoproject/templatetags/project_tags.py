@@ -10,3 +10,8 @@ register = template.Library()
 @register.filter
 def index(elem, index):
     return elem[index]
+
+
+@register.filter
+def image_first(elem):
+    return elem.first().photo.url

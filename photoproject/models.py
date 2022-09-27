@@ -59,5 +59,9 @@ class Receipt(models.Model):
 
     comment = models.TextField(blank=True)
 
+    file_document = models.FileField(
+        upload_to="exel/Data%y/%m/%d/", max_length=100, null=True
+    )
+
     def __str__(self):
         return f"{self.category.name} - {self.user.name} - {self.date} - {self.price}"
