@@ -19,27 +19,33 @@ from pdfrw import PdfWriter
 import io
 from django.core.files import File
 from csv2pdf import convert
+from PhotoProject.celery import debug_task
+from .tasks import save_pdf, send_email_with_receipt
+from django.core.mail import EmailMessage
+import requests
 
 
 @login_required(login_url="login")
 def index(request):
-
     my_receipts = handle_receipt.get_receipts_by_user(request.user)
 
-    context = {"my_receipts": my_receipts}
+    send_mail = request.COOKIES.get("send_mail")
 
-    return render(request, "photo/home.html", context)
+    context = {"my_receipts": my_receipts, "cookie": send_mail}
+
+    response = render(request, "photo/home.html", context)
+
+    response.delete_cookie("send_mail")
+
+    return response
 
 
-def send(request):
+@login_required(login_url="login")
+def send_receipt_to_email(request, email, receipt_id):
 
-    send_mail(
-        "Subject here",
-        "Here is the message.",
-        "bookingdjangoprojkpi@gmail.com",
-        ["duhanov2003@gmail.com"],
-        fail_silently=False,
-    )
+    receipt = handle_receipt.get_receipt_by_id(receipt_id)
+
+    send_email_with_receipt.delay(email, receipt_id, receipt.file_document.url)
 
     return redirect("home")
 
@@ -62,9 +68,13 @@ def create_receipt(request):
             handle_receipt.save_images(receipt, request.FILES)
             # print(form.cleaned_data, form.is_valid(), request.POST, request.FILES)
             receipt.save()
-            handle_receipt.save_pdf_to_db(receipt.id)
+            save_pdf.delay(receipt.id)
 
-            return redirect("home")
+            response = redirect("home")
+
+            response.set_cookie("send_mail", receipt.id)
+
+            return response
 
         else:
             messages.error(request, form.errors)
@@ -160,8 +170,14 @@ def edit_receipt(request, receipt_id):
             handle_receipt.save_edit_images(receipt, request.FILES)
             # print(form.cleaned_data, form.is_valid(), request.POST, request.FILES)
             receipt.save()
-            handle_receipt.save_pdf_to_db(receipt_id)
-            return redirect("home")
+            save_pdf.delay(receipt.id)
+            response = redirect("home")
+
+            # response = handle_receipt.get_download_response(receipt)
+
+            response.set_cookie("send_mail", receipt.id)
+
+            return response
 
         else:
             messages.error(request, form.errors)
@@ -184,6 +200,19 @@ def delete_receipt(request, receipt_id):
     receipt = handle_receipt.get_receipt_by_user(receipt_id)
     try:
         handle_receipt.delete_receipt_and_components(receipt)
+    except Exception as ex:
+        messages.error(request, ex)
+        print(ex)
+    return redirect("home")
+
+
+@login_required(login_url="login")
+def download_receipt(request, receipt_id):
+
+    receipt = handle_receipt.get_receipt_by_user(receipt_id)
+    try:
+        response = handle_receipt.get_download_response(receipt)
+        return response
     except Exception as ex:
         messages.error(request, ex)
         print(ex)

@@ -55,6 +55,7 @@
                         <div class="bottom-block" style="display: flex; justify-content:space-between; width:99%; margin-bottom:10px">
                             <div class="a"></div>
                             <div class="block" style="display: flex; justify-content:space-around; gap:10px">
+                                <a href="{% url 'download_receipt2' receipt.id %}">Download receipt</a>
                                 {% if receipt.file_document %}
                                     <a class="btn btn-primary " href="{{receipt.file_document.url}}" target="_blank">Read Receipt</a>
                                 {% else %}
@@ -81,6 +82,22 @@
             </div>
         {% endfor %}
     </div>
+    {% if cookie %}
+        <div class="popup active" id="popup-1">
+            <div class="overlay"></div>
+            <div class="content">
+            <div class="close-btn" onclick="togglePopup()">&times;</div>
+            <h2 style="font-family: serif;">Send receipt</h2>
+            <div class="block mb-3 mt-3">
+                <input placeholder="Email"  type="text" style="border:1px solid green" class="form-control email-input">
+            </div>
+            <div class="block-error" style=""></div>
+           <div class="block block-send-button " style="">
+            <a  href="" style="width:100%; " class="btn btn-success email_send ">Send</a>
+           </div>
+            </div>
+        </div>
+    {% endif %}
     
 </div>
 
@@ -108,6 +125,11 @@
    })
 
 
+   function togglePopup(){
+    document.getElementById("popup-1").classList.toggle("active");
+  }
+
+
    var block_list = document.querySelector(".block_list")
    var receiptImage;
    block_list.onclick = (e)=>{
@@ -131,8 +153,70 @@
     }
    }
 
+   function ValidateEmail(email) 
+    {
+        console.log(email)
+        const re =  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
-   </script>
+
+    if (email.match(re))
+    {
+        return (true)
+    }
+        return (false)
+    }
+
+
+  var cookie = "{{cookie}}"
+  if (cookie !="None"){
+
+      var email_input = document.querySelector(".email-input")
+      var email_send = document.querySelector(".email_send")
+      
+      if (!email_input.value.length){
+          email_send.classList.toggle("disabled")
+          
+        }
+        
+        var email_value;
+        email_input.oninput = (e) =>{
+            email_value = e.target.value
+        }
+        
+        
+        if (cookie){
+            var url = `{% url 'download_receipt'  %}`
+            document.location.href = url  + cookie + "/"
+        }
+
+        email_send.onclick = (e) =>{
+            e.preventDefault()
+            var url = `{% url 'send_receipt_to_email'  %}`
+            document.location.href = url + email_value + "/" + cookie + "/"
+    }
+
+    email_input.addEventListener('blur', (event) => {
+        var value = ValidateEmail(email_input.value)
+    console.log(value)
+    var error_block = document.querySelector(".block-error")
+    if (!value){
+        error_block.innerHTML = "Please write a valid email"
+        error_block.style.color = "red"
+        error_block.style.textAlign = "left"
+        error_block.style.marginTop = "-15px"
+        error_block.style.marginBottom = "5px"
+        error_block.style.fontSize = "12px"
+        error_block.style.display= "block"
+        }else{
+            error_block.style.display= "none"
+            email_send.classList.toggle("disabled")
+            
+        }
+    });
+}
+
+
+</script>
 
 {% endblock javascript %}
 

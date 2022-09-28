@@ -4,7 +4,11 @@
 {% load project_tags %}
 
 {% block link %}
-    <link rel="stylesheet" href="{% static 'css/base/home.css' %}">
+    <style>
+        body {
+            background: #D6EFED;
+        }
+    </style>
     <link rel="stylesheet" href="{% static 'css/falcon/flatpickr.min.css' %}">
 {% endblock link %}
 
@@ -109,7 +113,7 @@
         
 
         
-        <div class="form-group">
+        <div class="" style="border:1px solid red">
             <button type="submit"
                     class="form-control btn rounded submit px-3 button_create" style="background: #898AA6; color:#EAF6F6; font-size: 20px;">Create</button>
         </div>

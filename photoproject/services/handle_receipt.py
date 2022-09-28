@@ -10,7 +10,6 @@ from django.utils.encoding import smart_str
 from django.http.response import HttpResponse
 import csv
 
-
 HTML_DIRECTORY = os.path.join(settings.BASE_DIR, "media/htmls")
 PDF_DIRECTORY = os.path.join(settings.BASE_DIR, "media/pdfs")
 PDF_MEDIA_RELATED = "/pdfs"
@@ -287,3 +286,21 @@ def save_pdf_to_db(receipt_id):
     receipt.file_document.name = PDF_MEDIA_RELATED + f"/receipt_{receipt_id}.pdf"
     receipt.save()
     print(receipt, receipt.id, receipt.file_document)
+
+
+def get_download_response(receipt):
+    file_location = str(settings.BASE_DIR) + receipt.file_document.url
+
+    # response1 = requests.get(f"{config('HOST')}:{config('PORT')}{receipt.file_document.url}")
+    # # response = requests.get(pdf.url_link)
+    with open(file_location, "rb") as f:
+        file_data = f.read()
+        response = HttpResponse(
+            file_data,
+            content_type="application/pdf",
+        )
+        response[
+            "Content-Disposition"
+        ] = f'attachment; filename="receipt_{receipt.id}.pdf"'
+
+    return response
