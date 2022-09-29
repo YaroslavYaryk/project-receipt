@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "widget_tweaks",
+    "django_celery_beat",
     "accounts",
     "photoproject",
 ]
@@ -116,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Kyiv"
 
 USE_I18N = True
 
@@ -150,3 +151,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # celery
 CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_TIMEZONE = "Europe/Kyiv"
+
+# CELERY_RESULT_BACKEND = "django-db"
+
+# CELERY BEAT
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"

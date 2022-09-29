@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Photo, Receipt, Project
+from .models import Category, Photo, Receipt, Project, ProjectReceipts
 
 # Register your models here.
 
@@ -17,3 +17,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Receipt)
 admin.site.register(Photo)
 admin.site.register(Project)
+admin.site.register(ProjectReceipts)

@@ -1,4 +1,4 @@
-from photoproject.models import Category, Photo, Project, Receipt
+from photoproject.models import Category, Photo, Project, Receipt, ProjectReceipts
 from django.utils.text import slugify
 from django.conf import settings
 import os
@@ -9,6 +9,14 @@ from csv2pdf import convert
 from django.utils.encoding import smart_str
 from django.http.response import HttpResponse
 import csv
+from io import BytesIO
+from django.core.files import File
+from photoproject.utils import render_to_pdf
+from weasyprint import HTML, CSS
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.template.loader import get_template
+from datetime import date
+
 
 HTML_DIRECTORY = os.path.join(settings.BASE_DIR, "media/htmls")
 PDF_DIRECTORY = os.path.join(settings.BASE_DIR, "media/pdfs")
@@ -123,15 +131,7 @@ def get_receipt_by_id(receipt_id):
     return Receipt.objects.get(pk=receipt_id)
 
 
-def save_pdf_to_db(receipt_id):
-    # response content type
-    response = HttpResponse(content_type="text/csv")
-    # decide the file name
-    response["Content-Disposition"] = 'attachment; filename="ThePythonDjango.csv"'
-    receipt = get_receipt_by_id(receipt_id)
-    writer = csv.writer(response, csv.excel)
-    response.write("\ufeff".encode("utf8"))
-
+def writer_write_row(writer, receipt):
     writer.writerow(
         [
             smart_str("Company: "),
@@ -250,42 +250,25 @@ def save_pdf_to_db(receipt_id):
             smart_str("Sum"),
         ]
     )
-    writer.writerow(
-        [
-            smart_str(str(receipt.date)),
-            smart_str(receipt.description),
-            smart_str(receipt.category.name),
-            smart_str(receipt.persons),
-            smart_str(receipt.price),
-        ]
-    )
 
-    if receipt.comment:
-        writer.writerow(
-            [
-                smart_str("Comment: "),
-                smart_str(receipt.comment),
-                smart_str(" "),
-                smart_str(" "),
-                smart_str(" "),
-            ]
-        )
-    file = File(io.BytesIO(response.getvalue()), name="file.csv")  # << the answer!
-    receipt.file_document = file
-    receipt.save()
 
-    convert(
-        str(settings.BASE_DIR) + receipt.file_document.url,
-        PDF_DIRECTORY + f"/receipt_{receipt_id}.pdf",
-        font="Roboto-Black.ttf",
-        headerfont="Roboto-Bold.ttf",
-        size=3,
-        align="L",
+def save_pdf_to_db(receipt_id):
+
+    receipt = get_receipt_by_id(receipt_id)
+
+    html_template = get_template("static/excel_layout.html")
+    # user = request.user
+    # print(html_template, "here")
+    rendered_html = html_template.render({"receipt": receipt})
+
+    pdf_file = HTML(string=rendered_html).write_pdf()
+
+    receipt.file_document = SimpleUploadedFile(
+        f"receipt_{receipt_id}.pdf",
+        pdf_file,
+        content_type="application/pdf",
     )
-    print(receipt, receipt.id, receipt.file_document.name)
-    receipt.file_document.name = PDF_MEDIA_RELATED + f"/receipt_{receipt_id}.pdf"
     receipt.save()
-    print(receipt, receipt.id, receipt.file_document)
 
 
 def get_download_response(receipt):
@@ -304,3 +287,62 @@ def get_download_response(receipt):
         ] = f'attachment; filename="receipt_{receipt.id}.pdf"'
 
     return response
+
+
+def get_receipts_for_project(project):
+    return Receipt.objects.filter(project=project)
+
+
+def writer_project_write_row(writer, project):
+
+    writer.writerow(
+        [
+            smart_str("Project: "),
+            smart_str(project.name),
+            smart_str(" "),
+            smart_str(" "),
+            smart_str(" "),
+        ]
+    )
+    writer.writerow(
+        [
+            smart_str(" "),
+            smart_str(" "),
+            smart_str(" "),
+            smart_str(" "),
+            smart_str(" "),
+        ]
+    )
+
+    writer.writerow(
+        [
+            smart_str("Date "),
+            smart_str("Description"),
+            smart_str("Category"),
+            smart_str("People"),
+            smart_str("Sum"),
+        ]
+    )
+
+
+def save_pdf_for_project_to_db(project):
+
+    receipts = get_receipts_for_project(project)
+    html_template = get_template("static/excel_project.html")
+    total_price = sum(el.price for el in receipts)
+    rendered_html = html_template.render(
+        {"project": project, "receipts": receipts, "total_price": total_price}
+    )
+
+    pdf_file = HTML(string=rendered_html).write_pdf()
+
+    proj_file_instance = ProjectReceipts.objects.create(
+        project=project,
+        file_document=SimpleUploadedFile(
+            f"project_{project.id}_{date.today()}.pdf",
+            pdf_file,
+            content_type="application/pdf",
+        ),
+    )
+
+    return proj_file_instance

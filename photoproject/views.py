@@ -171,6 +171,7 @@ def edit_receipt(request, receipt_id):
             # print(form.cleaned_data, form.is_valid(), request.POST, request.FILES)
             receipt.save()
             save_pdf.delay(receipt.id)
+            # handle_receipt.save_pdf_to_db(receipt_id)
             response = redirect("home")
 
             # response = handle_receipt.get_download_response(receipt)
@@ -222,11 +223,20 @@ def download_receipt(request, receipt_id):
 # , 'content','getvalue', 'has_header', 'headers', 'items', 'make_bytes', 'readable', 'reason_phrase', 'seekable', 'serialize', 'serialize_headers', 'set_cookie', 'set_signed_cookie', 'setdefault', 'status_code', 'streaming', 'tell', 'writable', 'write', 'writelines'
 
 
-def excel_layout(request, receipt_id):
-    receipt = handle_receipt.get_receipt_by_id(receipt_id)
-
+def excel_layout(request, project_id):
+    project = handle_receipt.get_project_by_id(project_id)
+    print(project)
+    receipts = handle_receipt.get_receipts_for_project(project)
+    print(receipts)
+    total_price = sum(el.price for el in receipts)
     return render(
         request,
-        "static/excel_layout.html",
-        {"receipt": receipt, "a": list(range(13)), "b": list(range(27))},
+        "static/excel_project.html",
+        {
+            "project": project,
+            "a": list(range(13)),
+            "total_price": total_price,
+            "receipts": receipts,
+            "b": list(range(27)),
+        },
     )

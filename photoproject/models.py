@@ -65,3 +65,17 @@ class Receipt(models.Model):
 
     def __str__(self):
         return f"{self.category.name} - {self.user.name} - {self.date} - {self.price}"
+
+
+class ProjectReceipts(models.Model):
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+
+    file_document = models.FileField(
+        upload_to="exel/Data%y/%m/%d/", max_length=100, null=True
+    )
+
+    date = models.DateField(auto_now=False, auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.project} - {self.date}"

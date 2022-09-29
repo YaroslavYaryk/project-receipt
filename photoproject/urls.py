@@ -10,6 +10,7 @@ from .views import (
     delete_receipt,
     send_receipt_to_email,
     download_receipt,
+    excel_layout,
 )
 
 urlpatterns = [
@@ -29,4 +30,5 @@ urlpatterns = [
     path("projects_list/", get_projects_list, name="get_projects_list"),
     path("download_receipt/", download_receipt, name="download_receipt"),
     path("download_receipt/<receipt_id>/", download_receipt, name="download_receipt2"),
+    path("excel_layout/<project_id>/", excel_layout, name="excel_layout"),
 ]
