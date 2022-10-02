@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
     index,
     create_receipt,
@@ -11,9 +11,12 @@ from .views import (
     send_receipt_to_email,
     download_receipt,
     excel_layout,
+    get_project_reports,
 )
+from .api import urls as photoproj_api
 
 urlpatterns = [
+    path("api/", include(photoproj_api)),
     path("", index, name="home"),
     path("send_email/", send_receipt_to_email, name="send_receipt_to_email"),
     path(
@@ -31,4 +34,7 @@ urlpatterns = [
     path("download_receipt/", download_receipt, name="download_receipt"),
     path("download_receipt/<receipt_id>/", download_receipt, name="download_receipt2"),
     path("excel_layout/<project_id>/", excel_layout, name="excel_layout"),
+    path(
+        "project_reports/<project_id>/", get_project_reports, name="get_project_reports"
+    ),
 ]

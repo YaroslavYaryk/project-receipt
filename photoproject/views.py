@@ -240,3 +240,14 @@ def excel_layout(request, project_id):
             "b": list(range(27)),
         },
     )
+
+
+@login_required(login_url="login")
+def get_project_reports(request, project_id):
+
+    project = handle_receipt.get_project_by_id(project_id)
+    reports = handle_receipt.get_product_reports(project)
+
+    context = {"project": project, "reports": reports}
+
+    return render(request, "photo/product_reports.html", context)

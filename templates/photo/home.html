@@ -55,7 +55,6 @@
                         <div class="bottom-block" style="display: flex; justify-content:space-between; width:99%; margin-bottom:10px">
                             <div class="a"></div>
                             <div class="block" style="display: flex; justify-content:space-around; gap:10px">
-                                <a href="{% url 'download_receipt2' receipt.id %}">Download receipt</a>
                                 {% if receipt.file_document %}
                                     <a class="btn btn-primary " href="{{receipt.file_document.url}}" target="_blank">Read Receipt</a>
                                 {% else %}

@@ -2,17 +2,8 @@ from photoproject.models import Category, Photo, Project, Receipt, ProjectReceip
 from django.utils.text import slugify
 from django.conf import settings
 import os
-from pdfrw import PdfWriter
-import io
-from django.core.files import File
-from csv2pdf import convert
-from django.utils.encoding import smart_str
 from django.http.response import HttpResponse
-import csv
-from io import BytesIO
-from django.core.files import File
-from photoproject.utils import render_to_pdf
-from weasyprint import HTML, CSS
+from weasyprint import HTML
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.template.loader import get_template
 from datetime import date
@@ -131,127 +122,6 @@ def get_receipt_by_id(receipt_id):
     return Receipt.objects.get(pk=receipt_id)
 
 
-def writer_write_row(writer, receipt):
-    writer.writerow(
-        [
-            smart_str("Company: "),
-            smart_str(receipt.company),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str("Project: "),
-            smart_str(receipt.project.name),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str("Submitter "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str("Name: "),
-            smart_str(receipt.user.name),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str("Phone: "),
-            smart_str(receipt.user.phone),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str("Reimburser "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str("Name: "),
-            smart_str(receipt.user.name),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str("Phone: "),
-            smart_str(receipt.user.phone),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str("Account number: "),
-            smart_str(receipt.user.account_number),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-
-    writer.writerow(
-        [
-            smart_str("Date "),
-            smart_str("Description"),
-            smart_str("Category"),
-            smart_str("People"),
-            smart_str("Sum"),
-        ]
-    )
-
-
 def save_pdf_to_db(receipt_id):
 
     receipt = get_receipt_by_id(receipt_id)
@@ -293,38 +163,6 @@ def get_receipts_for_project(project):
     return Receipt.objects.filter(project=project)
 
 
-def writer_project_write_row(writer, project):
-
-    writer.writerow(
-        [
-            smart_str("Project: "),
-            smart_str(project.name),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-    writer.writerow(
-        [
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-            smart_str(" "),
-        ]
-    )
-
-    writer.writerow(
-        [
-            smart_str("Date "),
-            smart_str("Description"),
-            smart_str("Category"),
-            smart_str("People"),
-            smart_str("Sum"),
-        ]
-    )
-
-
 def save_pdf_for_project_to_db(project):
 
     receipts = get_receipts_for_project(project)
@@ -346,3 +184,11 @@ def save_pdf_for_project_to_db(project):
     )
 
     return proj_file_instance
+
+
+def get_product_reports(project):
+    return ProjectReceipts.objects.filter(project=project)
+
+
+def get_category_by_id(pk):
+    return Category.objects.get(pk=pk)

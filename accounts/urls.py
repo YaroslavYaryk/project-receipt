@@ -1,10 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 from .views import LoginUser, RegisterUser, LogoutUser
 from .views import get_profile_edit, get_profile, change_password
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import PasswordChangeDoneView, PasswordChangeView
+from .api import urls
 
 urlpatterns = [
+    path("api/", include(urls)),
     path("login/", LoginUser.as_view(), name="login"),
     path("register/", RegisterUser.as_view(), name="register"),
     path("logout/", LogoutUser.as_view(), name="logout"),

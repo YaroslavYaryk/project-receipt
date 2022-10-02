@@ -39,19 +39,19 @@ def send_email_to_project_users():
 
         proj_file_instance = save_pdf_for_project_to_db(project)
 
-        message = EmailMessage(
-            "Project receipts file",
-            f"Here is the the pdf for project_{project.id} reseipts for last week ",
-            "bookingdjangoprojkpi@gmail.com",
-            [project.user.email],
-            headers={"Message-ID": "foo"},
-        )
-        message.attach_file(
-            str(settings.BASE_DIR) + proj_file_instance.file_document.url
-        )
+        # message = EmailMessage(
+        #     "Project receipts file",
+        #     f"Here is the the pdf for project_{project.id} reseipts for last week ",
+        #     "bookingdjangoprojkpi@gmail.com",
+        #     [project.user.email],
+        #     headers={"Message-ID": "foo"},
+        # )
+        # message.attach_file(
+        #     str(settings.BASE_DIR) + proj_file_instance.file_document.url
+        # )
 
-        message.send()
-    print("done")
+        # message.send()
+    # print("done")
 
 
 @shared_task

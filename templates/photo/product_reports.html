@@ -1,0 +1,33 @@
+{% extends '../base/base.html' %}
+{% load static %}
+
+
+{% block link %}
+    <link rel="stylesheet" href="{% static 'css/base/home.css' %}">
+{% endblock link %}
+
+{% block section %}
+
+<div class="container">
+   <div class="container__inner mt-5" style="border:1px solid grey; padding:20px">
+        {% for report in reports %}
+            <div class="block_list mb-2" style="display: flex; justify-content:space-between; ">
+                <div class="block_list_item">{{report.date}}</div>
+                <div class="block_list_item"><a target="_blank" class="btn btn-success" href="{{report.file_document.url}}">Report preview</a></div>
+            </div>
+            <div class="block_downline mb-3" style="height:1px; background: grey; width:100%">
+            </div>
+        {% endfor %}
+   </div>
+</div>
+
+{% endblock section %}
+
+{% block javascript %}
+
+   <script type="text/javascript">
+
+   
+   </script>
+
+{% endblock javascript %}
