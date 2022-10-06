@@ -192,3 +192,23 @@ def get_product_reports(project):
 
 def get_category_by_id(pk):
     return Category.objects.get(pk=pk)
+
+
+#  {"id": -1, "new": true, "value": "Нова категорія "}
+def add_project(instance, name, idd):
+
+    if idd == "-1":
+        instance.project = handle_create_project(name, instance.user)
+    else:
+        instance.project = get_project_by_id(idd)
+
+    instance.save()
+
+
+def add_category(instance, name, idd):
+    if idd == "-1":
+        instance.category = handle_create_category(name)
+    else:
+        instance.category = get_category_by_id(idd)
+
+    instance.save()

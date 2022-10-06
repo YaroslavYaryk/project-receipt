@@ -42,6 +42,8 @@ class ReceiptSerializer(ModelSerializer):
 
     photos = SerializerMethodField()
     file_document = SerializerMethodField()
+    project_name = SerializerMethodField()
+    category_name = SerializerMethodField()
 
     class Meta:
         model = Receipt
@@ -54,13 +56,22 @@ class ReceiptSerializer(ModelSerializer):
         ]
 
     def get_file_document(request, instance):
-        return f"{config('HOST')}:{config('PORT')}{instance.file_document.url}"
+        try:
+            return f"{config('HOST')}:{config('PORT')}{instance.file_document.url}"
+        except Exception:
+            return ""
+
+    def get_project_name(self, instance):
+        return instance.project.name
+
+    def get_category_name(self, instance):
+        return instance.category.name
 
 
 class ReceiptPostSerializer(ModelSerializer):
     class Meta:
         model = Receipt
-        exclude = "file_document", "photos"
+        exclude = "file_document", "photos", "project", "category"
 
 
 class ProjectReportSerializer(ModelSerializer):

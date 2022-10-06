@@ -5,6 +5,8 @@ from .views import (
     ReceiptListAPIView,
     ReceiptAPIView,
     ProjectReportsListAPIView,
+    CategoryListAPIView,
+    CategoryAPIView,
 )
 
 urlpatterns = [
@@ -23,6 +25,19 @@ urlpatterns = [
     path("project/<pk>/update/", ProjectAPIView.as_view(), name="update_project"),
     path("project/<pk>/delete/", ProjectAPIView.as_view(), name="delete_project"),
     # category
+    path(
+        "categories/",
+        CategoryListAPIView.as_view({"get": "list"}),
+        name="get_all_categories",
+    ),
+    path(
+        "categories/<pk>/",
+        CategoryListAPIView.as_view({"get": "retrieve"}),
+        name="get_spec_category",
+    ),
+    path("category/create/", CategoryAPIView.as_view(), name="create_category"),
+    path("category/update/<pk>/", CategoryAPIView.as_view(), name="update_category"),
+    path("category/delete/<pk>/", CategoryAPIView.as_view(), name="delete_category"),
     # receipt
     path(
         "receipts/",

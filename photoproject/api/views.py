@@ -1,4 +1,5 @@
-from photoproject.models import Category, ProjectReceipts
+from yaml import serialize
+from photoproject.models import Category, ProjectReceipts, Receipt
 from .serializers import (
     CategoryPostSerializer,
     CategorySerializer,
@@ -13,6 +14,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
+from photoproject.tasks import save_pdf, send_email_with_receipt
 
 from rest_framework.generics import (
     CreateAPIView,
@@ -50,6 +52,7 @@ class ProjectAPIView(APIView):
 
     def post(self, request):
         data = {**request.data, "user": request.user.id}
+        print(data)
         serializer = ProjectPostSerializer(data=data)
         if serializer.is_valid():
             instance = serializer.save()
@@ -94,7 +97,7 @@ class CategoryListAPIView(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-class ProjectAPIView(APIView):
+class CategoryAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -147,50 +150,76 @@ class ReceiptAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+
         data = {
-            "project": request.data["project"],
-            "category": request.data["category"],
             "company": request.data["company"],
             "date": request.data["date"],
             "price": request.data["price"],
             "description": request.data["description"],
             "business": request.data["business"],
             "persons": request.data["persons"],
-            "comment": request.data["comment"],
+            "comment": request.data.get("comment"),
             "user": request.user.id,
         }
         serializer = ReceiptPostSerializer(data=data)
+
+        # new_serializer = ReceiptSerializer(Receipt.objects.get(pk=10))
         if serializer.is_valid():
             instance = serializer.save()
+            handle_receipt.add_project(
+                instance, request.data["project"], request.data["project_id"]
+            )
+            handle_receipt.add_category(
+                instance, request.data["category"], request.data["category_id"]
+            )
+
             if request.data.get("photos"):
                 handle_receipt.save_images(instance, request.data)
-
-            return Response({**serializer.data, "id": instance.id})
-        # print(serializer.errors)
+            instance.save()
+            try:
+                save_pdf.delay(instance.id)
+            except Exception as ex:
+                print(ex)
+            new_serializer = ReceiptSerializer(
+                instance=Receipt.objects.get(pk=instance.id)
+            )
+            return Response(new_serializer.data)
         return Response(serializer.error_messages)
 
     def put(self, request, pk):
         instance = handle_receipt.get_receipt_by_id(pk)
         data = {
-            "project": request.data["project"],
-            "category": request.data["category"],
             "company": request.data["company"],
             "date": request.data["date"],
             "price": request.data["price"],
             "description": request.data["description"],
             "business": request.data["business"],
             "persons": request.data["persons"],
-            "comment": request.data["comment"],
+            "comment": request.data.get("comment"),
             "user": request.user.id,
         }
         serializer = ReceiptPostSerializer(data=data, instance=instance)
         if serializer.is_valid():
             instance = serializer.save()
-            if request.data.get("photos"):
-                handle_receipt.save_edit_images(instance, request.data)
+            handle_receipt.add_project(
+                instance, request.data["project"], request.data["project_id"]
+            )
+            handle_receipt.add_category(
+                instance, request.data["category"], request.data["category_id"]
+            )
 
-            return Response({**serializer.data, "id": instance.id})
-        # print(serializer.errors)
+            if request.data.get("photos"):
+                handle_receipt.save_images(instance, request.data)
+            instance.save()
+            try:
+                save_pdf.delay(instance.id)
+            except Exception as ex:
+                print(ex)
+            new_serializer = ReceiptSerializer(
+                instance=Receipt.objects.get(pk=instance.id)
+            )
+            return Response(new_serializer.data)
+
         return Response(serializer.error_messages)
 
     def delete(self, request, pk):

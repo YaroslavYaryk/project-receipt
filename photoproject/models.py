@@ -41,7 +41,9 @@ class Receipt(models.Model):
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
 
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     photos = models.ManyToManyField(Photo)
 
@@ -64,7 +66,7 @@ class Receipt(models.Model):
     )
 
     def __str__(self):
-        return f"{self.category.name} - {self.user.name} - {self.date} - {self.price}"
+        return f" {self.id} - {self.category.name} - {self.user.name} - {self.date} - {self.price}"
 
 
 class ProjectReceipts(models.Model):
@@ -78,4 +80,4 @@ class ProjectReceipts(models.Model):
     date = models.DateField(auto_now=False, auto_now_add=True)
 
     def __str__(self):
-        return f"{self.project} - {self.date}"
+        return f"{self.project.id} - {self.date}"
