@@ -84,3 +84,21 @@ class ProjectReportSerializer(ModelSerializer):
 
     def get_file_document(request, instance):
         return f"{config('HOST')}:{config('PORT')}{instance.file_document.url}"
+
+
+class ReceiptFileSerializer(ModelSerializer):
+
+    file_document = SerializerMethodField()
+
+    class Meta:
+        model = Receipt
+        fields = (
+            "id",
+            "file_document",
+        )
+
+    def get_file_document(request, instance):
+        try:
+            return f"{config('HOST')}:{config('PORT')}{instance.file_document.url}"
+        except Exception:
+            return ""

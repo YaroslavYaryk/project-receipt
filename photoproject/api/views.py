@@ -1,4 +1,4 @@
-from yaml import serialize
+from rest_framework import status
 from photoproject.models import Category, ProjectReceipts, Receipt
 from .serializers import (
     CategoryPostSerializer,
@@ -8,6 +8,7 @@ from .serializers import (
     ProjectPostSerializer,
     ReceiptPostSerializer,
     ReceiptSerializer,
+    ReceiptFileSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -59,7 +60,10 @@ class ProjectAPIView(APIView):
 
             return Response({**serializer.data, "id": instance.id})
 
-        return Response(serializer.error_messages)
+        message = "\n".join(
+            [el.title() for values in serializer.errors.values() for el in values]
+        )
+        return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
         instance = handle_receipt.get_project_by_id(pk)
@@ -70,7 +74,10 @@ class ProjectAPIView(APIView):
 
             return Response({**serializer.data, "id": instance.id})
 
-        return Response(serializer.error_messages)
+        message = "\n".join(
+            [el.title() for values in serializer.errors.values() for el in values]
+        )
+        return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         instance = handle_receipt.get_project_by_id(pk)
@@ -79,7 +86,7 @@ class ProjectAPIView(APIView):
             instance.delete()
             return Response(data)
         except Exception as ex:
-            return Response({"error": str(ex)})
+            return Response({"message": str(ex)})
 
 
 class CategoryListAPIView(viewsets.ViewSet):
@@ -108,7 +115,10 @@ class CategoryAPIView(APIView):
 
             return Response({**serializer.data, "id": instance.id})
 
-        return Response(serializer.error_messages)
+        message = "\n".join(
+            [el.title() for values in serializer.errors.values() for el in values]
+        )
+        return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
         instance = handle_receipt.get_category_by_id(pk)
@@ -119,7 +129,10 @@ class CategoryAPIView(APIView):
 
             return Response({**serializer.data, "id": instance.id})
 
-        return Response(serializer.error_messages)
+        message = "\n".join(
+            [el.title() for values in serializer.errors.values() for el in values]
+        )
+        return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         instance = handle_receipt.get_category_by_id(pk)
@@ -128,7 +141,7 @@ class CategoryAPIView(APIView):
             instance.delete()
             return Response(data)
         except Exception as ex:
-            return Response({"error": str(ex)})
+            return Response({"message": str(ex)})
 
 
 class ReceiptListAPIView(viewsets.ViewSet):
@@ -184,7 +197,10 @@ class ReceiptAPIView(APIView):
                 instance=Receipt.objects.get(pk=instance.id)
             )
             return Response(new_serializer.data)
-        return Response(serializer.error_messages)
+        message = "\n".join(
+            [el.title() for values in serializer.errors.values() for el in values]
+        )
+        return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
         instance = handle_receipt.get_receipt_by_id(pk)
@@ -220,7 +236,10 @@ class ReceiptAPIView(APIView):
             )
             return Response(new_serializer.data)
 
-        return Response(serializer.error_messages)
+        message = "\n".join(
+            [el.title() for values in serializer.errors.values() for el in values]
+        )
+        return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         instance = handle_receipt.get_receipt_by_id(pk)
@@ -246,3 +265,15 @@ class ProjectReportsListAPIView(viewsets.ViewSet):
         queryset = ProjectReceipts.objects.get(id=pk)
         serializer = ProjectReportSerializer(queryset)
         return Response(serializer.data)
+
+
+@api_view(["GET"])
+def get_receipt_file(request, receipt):
+
+    try:
+        instance = Receipt.objects.get(pk=receipt)
+        serializer = ReceiptFileSerializer(instance=instance)
+
+        return Response(serializer.data)
+    except Exception as ex:
+        return Response({"message": str(ex)})

@@ -95,6 +95,18 @@ class UserApiView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        serializer = UserEditBaseSerializer(instance=user, data=request.data)
+        if serializer.is_valid():
+            instance = serializer.save()
+            new_serializer = UserSerializer(instance)
+            return Response(new_serializer.data, status=status.HTTP_201_CREATED)
+        message = "\n".join(
+            [el.title() for values in serializer.errors.values() for el in values]
+        )
+        return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
@@ -118,15 +130,3 @@ class CustomAuthToken(ObtainAuthToken):
                 raise Exception("Cannot log with this credentials")
         else:
             raise Exception("There is no such user")
-
-
-class UserEditBaseAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request, *args, **kwargs):
-        user = request.user
-        serializer = UserEditBaseSerializer(instance=user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

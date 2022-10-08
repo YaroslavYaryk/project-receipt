@@ -1,4 +1,5 @@
 from datetime import date
+from enum import unique
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.exceptions import ValidationError
@@ -63,7 +64,7 @@ class User(AbstractBaseUser):
     postal_code = models.CharField(max_length=50, blank=True)
     city = models.CharField(max_length=150, blank=True)
     birthdate = models.DateField(null=True, blank=True)
-    account_number = models.IntegerField(null=True)
+    account_number = models.IntegerField(null=True, unique=True)
 
     is_active = models.BooleanField(default=True)  # can login
     admin = models.BooleanField(default=False)  # can login

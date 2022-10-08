@@ -62,4 +62,13 @@ class UserSerializer(serializers.ModelSerializer):
 class UserEditBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ("email", "name", "phone")
+        fields = (
+            "email",
+            "name",
+            "phone",
+            "city",
+            "address",
+            "postal_code",
+            "birthdate",
+            "account_number",
+        )

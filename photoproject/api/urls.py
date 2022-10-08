@@ -7,6 +7,7 @@ from .views import (
     ProjectReportsListAPIView,
     CategoryListAPIView,
     CategoryAPIView,
+    get_receipt_file,
 )
 
 urlpatterns = [
@@ -52,6 +53,11 @@ urlpatterns = [
     path("receipt/create/", ReceiptAPIView.as_view(), name="create_receipt"),
     path("receipt/update/<pk>/", ReceiptAPIView.as_view(), name="update_receipt"),
     path("receipt/delete/<pk>/", ReceiptAPIView.as_view(), name="delete_receipt"),
+    path(
+        "receipt/<receipt>/report_file/",
+        get_receipt_file,
+        name="get_receipt_report_file",
+    ),
     # project reports
     path(
         "project_reports/<proj>/all/",
