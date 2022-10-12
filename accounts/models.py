@@ -1,10 +1,9 @@
-from datetime import date
-from enum import unique
-
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.forms import DateTimeField
+
+from .tasks import send_reset_password_email
 
 
 class UserManager(BaseUserManager):
@@ -96,3 +95,39 @@ class User(AbstractBaseUser):
     def is_staff(self):
         "Is the user a admin member?"
         return self.staff
+
+
+from django.dispatch import receiver
+from django.urls import reverse
+from django_rest_passwordreset.signals import reset_password_token_created
+from django.core.mail import send_mail
+from django.template.loader import get_template
+from django.core.mail import EmailMessage
+from decouple import config
+from django.conf import settings
+
+
+@receiver(reset_password_token_created)
+def password_reset_token_created(
+    sender, instance, reset_password_token, *args, **kwargs
+):
+
+    return send_reset_password_email.delay(
+        reset_password_token.key, reset_password_token.user.email
+    )
+
+    # email_plaintext_message = get_template("photo/product.html").render(
+    #     {
+    #         "token": reset_password_token.key,
+    #         "image": f"{config('HOST')}:{config('PORT')}{settings.STATIC_URL + 'images/restaurant.jpg'}",
+    #     }
+    # )
+
+    # mail = EmailMessage(
+    #     subject="Password reset confirmation",
+    #     body=email_plaintext_message,
+    #     to=[reset_password_token.user.email],
+    #     # reply_to=[EMAIL_ADMIN],
+    # )
+    # mail.content_subtype = "html"
+    # return mail.send()

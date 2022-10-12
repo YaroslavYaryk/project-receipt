@@ -2,13 +2,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import (
+    ChangePasswordSerializer,
     CustomUserSerializer,
     UserEditBaseSerializer,
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -24,6 +25,7 @@ from django.contrib.auth.hashers import (
     check_password,
 )
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 
 
 class CustomUserCreate(APIView):
@@ -130,3 +132,48 @@ class CustomAuthToken(ObtainAuthToken):
                 raise Exception("Cannot log with this credentials")
         else:
             raise Exception("There is no such user")
+
+
+class ChangePasswordView(UpdateAPIView):
+    """
+    An endpoint for changing password.
+    """
+
+    serializer_class = ChangePasswordSerializer
+    model = User
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response(
+                    {"message": ["Wrong password."]},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                "status": "success",
+                "code": status.HTTP_200_OK,
+                "message": "Password updated successfully",
+                "data": [],
+            }
+
+            return Response(response)
+
+        message = "\n".join(
+            [el.title() for values in serializer.errors.values() for el in values]
+        )
+
+        return Response(
+            {"message": message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

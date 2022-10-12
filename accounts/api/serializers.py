@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from django.contrib.auth.models import User
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -72,3 +73,13 @@ class UserEditBaseSerializer(serializers.ModelSerializer):
             "birthdate",
             "account_number",
         )
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

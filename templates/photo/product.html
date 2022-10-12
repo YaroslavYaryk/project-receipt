@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  
+   
+  
+ <div><center>
+    <div style="padding:0 20px 40px"> 
+        <p><span class="il">Confirm</span> Password reset</p>
+     <p style="font-weight:normal;margin:16px 0 0 0;color:#474d57">Dear user,<br>You are trying to request a password reset.</p>
+     
+      <p>
+        Your verification code is:
+      </p>
+       <div style="font-size:32px;margin-top:16px;color:#1e2026">
+       {{token}} 
+     </div> 
+     <p>The verification code will be valid for 30 minutes. Please do not share your code with anyone.</p> 
+      <br>
+ </center></div>
+      
+ 
+</body>
+</html>

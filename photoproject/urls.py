@@ -12,6 +12,7 @@ from .views import (
     download_receipt,
     excel_layout,
     get_project_reports,
+    get_project,
 )
 from .api import urls as photoproj_api
 
@@ -36,5 +37,9 @@ urlpatterns = [
     path("excel_layout/<project_id>/", excel_layout, name="excel_layout"),
     path(
         "project_reports/<project_id>/", get_project_reports, name="get_project_reports"
+    ),
+    path(
+        "get_project/",
+        get_project,
     ),
 ]

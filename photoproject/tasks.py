@@ -3,6 +3,8 @@ from .services.handle_receipt import save_pdf_to_db, save_pdf_for_project_to_db
 from django.core.mail import EmailMessage
 from django.conf import settings
 from .models import Project
+from django.template.loader import get_template
+from django.core.mail import EmailMessage
 
 
 @shared_task()

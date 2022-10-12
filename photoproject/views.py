@@ -251,3 +251,14 @@ def get_project_reports(request, project_id):
     context = {"project": project, "reports": reports}
 
     return render(request, "photo/product_reports.html", context)
+
+
+@login_required(login_url="login")
+def get_project(request):
+
+    context = {
+        "token": "071d045e887180e4e72f01521b19f7d6ce99f0be9420e6f2ca",
+        "image": f"{config('HOST')}:{config('PORT')}/{settings.STATIC_URL + 'images/restaurant.jpg'}",
+    }
+
+    return render(request, "photo/product.html", context)
